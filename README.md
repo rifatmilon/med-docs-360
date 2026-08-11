@@ -57,14 +57,14 @@ The system is composed of two independent automation layers.
 Two cloud flows respond instantly to file creation events on OneDrive for Business.
 
 **Flow 1: Track Blank Documents**
-Triggered when a new file appears in the "CLF Medical" OneDrive folder. Extracts `File ID`, `Matter Number`, `Client Name` (from folder, normalized as `Lastname, Firstname`), `Doctor Name` (first name, split by `-`), `Uploaded At` (`MM/dd/yyyy`), `Uploaded By`, and `Filename`. Performs deduplication via `file_id` before writing to the **blank docs** table.
+Triggered when a new file appears in the designated OneDrive source folder (e.g., `/Medical Documents/`). Extracts `File ID`, `Matter Number`, `Client Name` (from folder, normalized as `Lastname, Firstname`), `Doctor Name` (first name, split by `-`), `Uploaded At` (`MM/dd/yyyy`), `Uploaded By`, and `Filename`. Performs deduplication via `file_id` before writing to the **blank docs** table.
 
 ![Track Blank Documents Workflow](images/MedDocs%20360%20-%20Track%20Blank%20Documents%20workflow%20-%20Microsoft%20Power%20Automate.png)
 
 ---
 
 **Flow 2: Track Completed & Reviewed Documents**
-Triggered on new file creation in the same OneDrive folder. Uses **dynamic path detection** to differentiate between files in `/Completed Client Questionnaires/` vs. nested subfolders (e.g., `/COMPLETED=by Angela or Abigail/`). Extracts `Client Name` from the filename (`Lastname Firstname`, split by `-`) and routes each record to either the **completed docs** or **reviewed docs** table based on the resolved path. Deduplication enforced via `file_id`.
+Triggered on new file creation in the same OneDrive folder. Uses **dynamic path detection** to differentiate between files placed directly in the root completed folder (e.g., `/Completed Questionnaires/`) vs. files inside nested subfolders (e.g., `/Completed - Staff Review/`). Extracts `Client Name` from the filename (`Lastname Firstname`, split by `-`) and routes each record to either the **completed docs** or **reviewed docs** table based on the resolved path. Deduplication enforced via `file_id`.
 
 ![Track Completed and Reviewed Documents Workflow](images/MedDocs%20360%20-%20Track%20Completed%20and%20Reviewed%20Documents%20workflow%20-%20Microsoft%20Power%20Automate.png)
 
@@ -113,8 +113,8 @@ At the core of the system is `n8n database` — a centralized Excel file with th
 
 Sample output files from the automated weekly pipeline:
 
-- [`CLF-Medical-Weekly-Report-07-23-2026.pdf`](sample-reports/CLF-Medical-Weekly-Report-07-23-2026.pdf)
-- [`CLF-Medical-Weekly-Report-07-23-2026.xlsx`](sample-reports/CLF-Medical-Weekly-Report-07-23-2026.xlsx)
+- [`sample-pdf-report.pdf`](sample-reports/sample-pdf-report.pdf)
+- [`sample-excel-report.xlsx`](sample-reports/sample-excel-report.xlsx)
 
 The Outlook email digest includes 4 color-coded metric stat cards and a direct Box folder link:
 
