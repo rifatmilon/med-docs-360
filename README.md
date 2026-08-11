@@ -10,7 +10,7 @@
 [![Box](https://img.shields.io/badge/Cloud%20Archive-Box-0061D5?style=for-the-badge&logo=box&logoColor=white)](https://www.box.com/)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge&logo=semver&logoColor=white)](https://semver.org/)
 
-<br/>
+</div>
 
 > **MedDocs 360** is a dual-layer automation system built for [Chambers Law Firm](https://www.chamberslaw.com/) that tracks medical questionnaire documents through their full lifecycle — **Blank → Completed → Reviewed** — in real time, and auto-generates weekly executive reports delivered as **PDF** and **Excel** to cloud storage and email.
 > - **Real-Time Tracking:** Two Power Automate cloud flows instantly log document events from OneDrive into a centralized Excel database with full deduplication.
@@ -18,10 +18,6 @@
 > - **Zero Manual Effort:** From file upload to executive inbox, the entire pipeline runs autonomously with no human intervention required.
 >
 > *Track every document. Report every week. Automatically.*
-
-<br/>
-
-</div>
 
 ---
 
@@ -34,7 +30,7 @@
   - [Layer 2 — Weekly Reporting Pipeline (n8n)](#layer-2--weekly-reporting-pipeline-n8n)
 - [Sample Reports & Notifications](#-sample-reports--notifications)
 - [Technical Stack](#️-technical-stack)
-- [Getting Started](#-getting-started)
+
 - [License](#-license)
 - [Author](#-author)
 
@@ -54,7 +50,7 @@
 
 ## 📊 Database & CRM Engine
 
-At the core of the system is `n8n-database.xlsx` — a centralized Excel file with three structured tracking tables that serve as the single source of truth for the entire pipeline.
+At the core of the system is `n8n database` — a centralized Excel file with three structured tracking tables that serve as the single source of truth for the entire pipeline.
 
 | Column | Description |
 |---|---|
@@ -67,9 +63,9 @@ At the core of the system is `n8n-database.xlsx` — a centralized Excel file wi
 | `filename` | Original document filename |
 
 **Sheets:**
-- `Med Docs Tracking - Blank Docs`
-- `Med Docs Tracking - C Docs` *(Completed)*
-- `Med Docs Tracking - C Docs Revie` *(Reviewed)*
+- `blank docs`
+- `completed docs`
+- `reviewed docs`
 
 ![Database — Blank Docs](images/Database%20-%20blank%20docs.png)
 ![Database — Completed Docs](images/Database%20-%20completed%20docs.png)
@@ -133,7 +129,7 @@ The Outlook email digest includes 4 color-coded metric stat cards and a direct B
 | **Real-Time Tracking** | [Microsoft Power Automate](https://powerautomate.microsoft.com/) | Instant event-driven flows triggered on OneDrive file creation |
 | **Reporting Pipeline** | [n8n](https://n8n.io/) | Weekly scheduled batch pipeline for filtering, compiling, and exporting reports |
 | **Source File Storage** | [Microsoft OneDrive for Business](https://www.microsoft.com/en-us/microsoft-365/onedrive/onedrive-for-business) | Watched folder where documents are uploaded by staff |
-| **Central Database** | [Microsoft Excel Online](https://www.microsoft.com/en-us/microsoft-365/excel) | Three-sheet tracking database (`n8n-database.xlsx`) |
+| **Central Database** | [Microsoft Excel Online](https://www.microsoft.com/en-us/microsoft-365/excel) | Three-sheet tracking database (`n8n database`) |
 | **Cloud Archive** | [Box](https://www.box.com/) | Destination for generated PDF and Excel weekly reports |
 | **PDF Engine** | [Api2Pdf](https://www.api2pdf.com/) | Converts the HTML report template to a polished PDF |
 | **Email Notifications** | [Microsoft Outlook](https://outlook.microsoft.com/) | Delivers the HTML stat-card email digest to stakeholders |
@@ -145,52 +141,9 @@ The Outlook email digest includes 4 color-coded metric stat cards and a direct B
 
 - **Deduplication by File ID:** Every record is keyed on the unique OneDrive Graph API `file_id`, ensuring no document is ever logged twice regardless of filename or timing.
 - **Dual-Format Archiving:** Reports are stored in both PDF and Excel formats on Box, creating an auditable, version-controlled record of weekly activity.
-- **Proprietary & Confidential:** This system is the exclusive property of Chambers Law Firm, P.A. All data handled by this pipeline is subject to firm confidentiality obligations.
+- **Proprietary & Confidential:** This system is the exclusive property of [Chambers Law Firm, P.A.](https://chamberslaw.com) All rights reserved.
 
 ---
-
-## 🚀 Getting Started
-
-### Prerequisites
-- An active [Microsoft Power Automate](https://powerautomate.microsoft.com/) account with access to OneDrive for Business and Excel Online.
-- An active [n8n](https://n8n.io/) instance (cloud or self-hosted).
-- A [Box](https://www.box.com/) account with an upload folder configured.
-- An [Api2Pdf](https://www.api2pdf.com/) account for PDF generation.
-- A [Microsoft 365](https://www.microsoft.com/en-us/microsoft-365) account with Outlook and Excel Online access.
-
-### Setup & Installation
-
-**1. Get the project files**
-Contact the author ([Md. Rifat Aknda](https://github.com/rifatmilon)) to receive the project directory. Once you have it, navigate into it:
-```bash
-cd <your-project-directory>
-```
-
-**2. Import the Power Automate flows**
-- Open [Power Automate](https://make.powerautomate.com/).
-- Go to **My Flows** → **Import** → **Import Package (.zip)**.
-- Import each `.zip` flow file included in the `workflows/` directory.
-- Reconnect all connections (OneDrive, Excel, Outlook) after import.
-
-**3. Import the n8n workflow**
-- Open your n8n dashboard.
-- Go to **Workflows** → **Import from File**.
-- Import the `.json` workflow file included in the `workflows/` directory.
-
-**4. Configure Credentials**
-Assign the following credentials in your n8n workspace:
-- `Microsoft Excel 365` — OAuth2 credentials with Excel Online scope
-- `Microsoft OneDrive` — OAuth2 credentials with OneDrive read scope
-- `Box` — OAuth2 credentials with upload access
-- `Api2Pdf` — API key
-- `Microsoft Outlook` — OAuth2 credentials with Mail send scope
-
-**5. Prepare the Database**
-Create the Excel file (`n8n-database.xlsx`) in OneDrive matching the three-sheet schema (`Med Docs Tracking - Blank Docs`, `Med Docs Tracking - C Docs`, `Med Docs Tracking - C Docs Revie`) and link it to the Excel nodes in both the Power Automate flows and the n8n workflow.
-
-**6. Activate & Schedule**
-- Turn on both Power Automate flows.
-- Set the n8n workflow's schedule trigger to your desired weekly cadence and activate it.
 
 ---
 
@@ -211,8 +164,12 @@ This project is **Proprietary and Confidential** — see the [LICENSE](LICENSE) 
 
 *AI/ML & Automation Engineer · AI/ML & IoT Researcher*
 
+---
+
 [![GitHub](https://img.shields.io/badge/GitHub-rifatmilon-181717?style=for-the-badge&logo=github)](https://github.com/rifatmilon)
+<br/>
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Md.%20Rifat%20Aknda-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/rifatmilon/)
+<br/>
 [![Google Scholar](https://img.shields.io/badge/Google%20Scholar-Md.%20Rifat%20Aknda-4285F4?style=for-the-badge&logo=googlescholar)](https://scholar.google.com/citations?user=qPC0U2gAAAAJ)
 
 </div>
