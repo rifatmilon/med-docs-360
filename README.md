@@ -170,6 +170,8 @@ This project is **Proprietary and Confidential** — see the [LICENSE](LICENSE) 
 <br/>
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Md.%20Rifat%20Aknda-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/rifatmilon/)
 <br/>
+[![Fiverr](https://img.shields.io/badge/Fiverr-rifatmilon-1DBF73?style=for-the-badge&logo=fiverr&logoColor=white)](https://www.fiverr.com/rifatmilon)
+<br/>
 [![Google Scholar](https://img.shields.io/badge/Google%20Scholar-Md.%20Rifat%20Aknda-4285F4?style=for-the-badge&logo=googlescholar)](https://scholar.google.com/citations?user=qPC0U2gAAAAJ)
 
 </div>
