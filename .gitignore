@@ -1,0 +1,47 @@
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment & Secrets
+.env
+.env.local
+*.env
+
+# n8n
+# Exclude any local n8n exports with credentials baked in
+workflows/n8n/*.credentials.json
+
+# Power Automate
+# Zip packages are intentionally tracked (exported flows for version control)
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# SSH & certificate keys
+*.pem
+*.ppk
+*.key
+*.cert
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+
+# Workflow files
+workflows/
+*.json 
+*.zip
+
+# Temporary Dirs
+temp/
+
