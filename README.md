@@ -24,13 +24,13 @@
 ## 📑 Table of Contents
 
 - [Why MedDocs 360?](#-why-meddocs-360)
-- [Database & CRM Engine](#-database--crm-engine)
 - [Architecture & Workflows](#-architecture--workflows)
   - [Layer 1 — Real-Time Tracking (Power Automate)](#layer-1--real-time-tracking-power-automate)
   - [Layer 2 — Weekly Reporting Pipeline (n8n)](#layer-2--weekly-reporting-pipeline-n8n)
+- [Database & CRM Engine](#-database--crm-engine)
 - [Sample Reports & Notifications](#-sample-reports--notifications)
 - [Technical Stack](#️-technical-stack)
-
+- [Need a Similar Automation?](#-need-a-similar-automation)
 - [License](#-license)
 - [Author](#-author)
 
@@ -45,6 +45,42 @@
 | **No visibility into weekly activity** | A scheduled n8n pipeline filters the last 7 days of records per sheet and compiles a full metrics report every week. |
 | **Reports locked in one format** | The pipeline outputs both a **PDF** (via Api2Pdf) and an **Excel** `.xlsx` file, archived to Box and delivered by email. |
 | **Inconsistent client name formatting** | Custom JavaScript parsing normalizes names (`Lastname, Firstname`) and extracts doctor names from nested folder paths automatically. |
+
+---
+
+## ⚡ Architecture & Workflows
+
+The system is composed of two independent automation layers.
+
+### Layer 1 — Real-Time Tracking (Power Automate)
+
+Two cloud flows respond instantly to file creation events on OneDrive for Business.
+
+**Flow 1: Track Blank Documents**
+Triggered when a new file appears in the "CLF Medical" OneDrive folder. Extracts `File ID`, `Matter Number`, `Client Name` (from folder, normalized as `Lastname, Firstname`), `Doctor Name` (first name, split by `-`), `Uploaded At` (`MM/dd/yyyy`), `Uploaded By`, and `Filename`. Performs deduplication via `file_id` before writing to the **blank docs** table.
+
+![Track Blank Documents Workflow](images/MedDocs%20360%20-%20Track%20Blank%20Documents%20workflow%20-%20Microsoft%20Power%20Automate.png)
+
+---
+
+**Flow 2: Track Completed & Reviewed Documents**
+Triggered on new file creation in the same OneDrive folder. Uses **dynamic path detection** to differentiate between files in `/Completed Client Questionnaires/` vs. nested subfolders (e.g., `/COMPLETED=by Angela or Abigail/`). Extracts `Client Name` from the filename (`Lastname Firstname`, split by `-`) and routes each record to either the **completed docs** or **reviewed docs** table based on the resolved path. Deduplication enforced via `file_id`.
+
+![Track Completed and Reviewed Documents Workflow](images/MedDocs%20360%20-%20Track%20Completed%20and%20Reviewed%20Documents%20workflow%20-%20Microsoft%20Power%20Automate.png)
+
+---
+
+### Layer 2 — Weekly Reporting Pipeline (n8n)
+
+A scheduled n8n workflow runs every week to compile, export, and deliver the executive report.
+
+- **7-Day Dynamic Filtering:** Three independent filter code nodes handle date-range filtering per sheet — supporting both ISO date strings (`2026-07-21T02:06:11Z`) and Excel serial numbers (`46224`). Each tags records with a `_source` field (`blank`, `completed`, `reviewed`).
+- **HTML Report Generation:** A compile node generates a premium HTML report and outputs structured metrics (`totalFiles`, `totalBlank`, `totalCompleted`, `totalReviewed`, `periodStart`, `periodEnd`) for downstream use.
+- **PDF Export:** Converted from HTML via Api2Pdf and uploaded to Box.
+- **Excel Export:** Mapped via a dedicated Code node, converted to `.xlsx`, and uploaded to Box.
+- **Outlook Email Digest:** An HTML email with 4 color-coded metric stat cards, a document breakdown table, and a direct Box folder link — sent automatically after both uploads complete.
+
+![Report Generation Workflow](images/MedDocs%20360%20-%20Report%20Generation%20workflow%20-%20n8n.png)
 
 ---
 
@@ -70,42 +106,6 @@ At the core of the system is `n8n database` — a centralized Excel file with th
 ![Database — Blank Docs](images/Database%20-%20blank%20docs.png)
 ![Database — Completed Docs](images/Database%20-%20completed%20docs.png)
 ![Database — Reviewed Docs](images/Database%20-%20reviewed%20docs.png)
-
----
-
-## ⚡ Architecture & Workflows
-
-The system is composed of two independent automation layers.
-
-### Layer 1 — Real-Time Tracking (Power Automate)
-
-Two cloud flows respond instantly to file creation events on OneDrive for Business.
-
-**Flow 1: Track Blank Documents**
-Triggered when a new file appears in the "CLF Medical" OneDrive folder. Extracts `File ID`, `Matter Number`, `Client Name` (from folder, normalized as `Lastname, Firstname`), `Doctor Name` (first name, split by `-`), `Uploaded At` (`MM/dd/yyyy`), `Uploaded By`, and `Filename`. Performs deduplication via `file_id` before writing to the **Blank Docs** table.
-
-![Track Blank Documents Workflow](images/MedDocs%20360%20-%20Track%20Blank%20Documents%20workflow%20-%20Microsoft%20Power%20Automate.png)
-
----
-
-**Flow 2: Track Completed & Reviewed Documents**
-Triggered on new file creation in the same OneDrive folder. Uses **dynamic path detection** to differentiate between files in `/Completed Client Questionnaires/` vs. nested subfolders (e.g., `/COMPLETED=by Angela or Abigail/`). Extracts `Client Name` from the filename (`Lastname Firstname`, split by `-`) and routes each record to either the **Completed Docs** or **Reviewed Docs** table based on the resolved path. Deduplication enforced via `file_id`.
-
-![Track Completed and Reviewed Documents Workflow](images/MedDocs%20360%20-%20Track%20Completed%20and%20Reviewed%20Documents%20workflow%20-%20Microsoft%20Power%20Automate.png)
-
----
-
-### Layer 2 — Weekly Reporting Pipeline (n8n)
-
-A scheduled n8n workflow runs every week to compile, export, and deliver the executive report.
-
-- **7-Day Dynamic Filtering:** Three independent filter code nodes handle date-range filtering per sheet — supporting both ISO date strings (`2026-07-21T02:06:11Z`) and Excel serial numbers (`46224`). Each tags records with a `_source` field (`blank`, `completed`, `reviewed`).
-- **HTML Report Generation:** A compile node generates a premium HTML report and outputs structured metrics (`totalFiles`, `totalBlank`, `totalCompleted`, `totalReviewed`, `periodStart`, `periodEnd`) for downstream use.
-- **PDF Export:** Converted from HTML via Api2Pdf and uploaded to Box.
-- **Excel Export:** Mapped via a dedicated Code node, converted to `.xlsx`, and uploaded to Box.
-- **Outlook Email Digest:** An HTML email with 4 color-coded metric stat cards, a document breakdown table, and a direct Box folder link — sent automatically after both uploads complete.
-
-![Report Generation Workflow](images/MedDocs%20360%20-%20Report%20Generation%20workflow%20-%20n8n.png)
 
 ---
 
@@ -137,13 +137,11 @@ The Outlook email digest includes 4 color-coded metric stat cards and a direct B
 
 ---
 
-## 🔒 Data Integrity & Compliance
+## 🤝 Need a Similar Automation?
 
-- **Deduplication by File ID:** Every record is keyed on the unique OneDrive Graph API `file_id`, ensuring no document is ever logged twice regardless of filename or timing.
-- **Dual-Format Archiving:** Reports are stored in both PDF and Excel formats on Box, creating an auditable, version-controlled record of weekly activity.
-- **Proprietary & Confidential:** This system is the exclusive property of [Chambers Law Firm, P.A.](https://chamberslaw.com) All rights reserved.
+This system was custom-built for a specific legal workflow — but the architecture (real-time document tracking + automated multi-channel reporting) can be adapted for any industry: healthcare, finance, logistics, or legal.
 
----
+If you need a tailored document tracking or reporting automation built for your team, the contact links below are open.
 
 ---
 
@@ -168,7 +166,6 @@ This project is **Proprietary and Confidential** — see the [LICENSE](LICENSE) 
 
 [![GitHub](https://img.shields.io/badge/GitHub-rifatmilon-181717?style=for-the-badge&logo=github)](https://github.com/rifatmilon)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Md.%20Rifat%20Aknda-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/rifatmilon/)
-[![Fiverr](https://img.shields.io/badge/Fiverr-rifatmilon-1DBF73?style=for-the-badge&logo=fiverr&logoColor=white)](https://www.fiverr.com/rifatmilon)
 [![Google Scholar](https://img.shields.io/badge/Google%20Scholar-Md.%20Rifat%20Aknda-4285F4?style=for-the-badge&logo=googlescholar)](https://scholar.google.com/citations?user=qPC0U2gAAAAJ)
 
 </div>
